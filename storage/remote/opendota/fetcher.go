@@ -1,7 +1,6 @@
 package opendota
 
 import (
-	"bufio"
 	"context"
 	"errors"
 	"fmt"
@@ -21,24 +20,25 @@ func New() *Fetcher {
 	}
 }
 
-func (f *Fetcher) fetchData(ctx context.Context, url string) (io.Reader, func(), error) {
+func (f *Fetcher) fetchData(ctx context.Context, url string, decode func(reader io.Reader) error) error {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error while creating request: %w", err)
+		return fmt.Errorf("error while creating request: %w", err)
 	}
 
 	resp, err := f.client.Do(req.WithContext(ctx))
 	if err != nil {
-		return nil, nil, fmt.Errorf("error while sending response: %w", err)
+		return fmt.Errorf("error while sending response: %w", err)
 	}
-
-	closeFn := func() {
-		resp.Body.Close()
-	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, closeFn, errors.New("error status: " + resp.Status)
+		return errors.New("error status: " + resp.Status)
 	}
 
-	return bufio.NewReader(resp.Body), closeFn, nil
+	if err = decode(resp.Body); err != nil {
+		return fmt.Errorf("error while decoding data: %w", err)
+	}
+
+	return nil
 }

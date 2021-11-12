@@ -2,6 +2,7 @@ package error_generator
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 
 	"github.com/serhiihuberniuk/unstable-api/models"
@@ -32,4 +33,30 @@ func generateError() error {
 	}
 
 	return nil
+}
+
+func (f *ErrorGeneratorDecorator) Leagues(ctx context.Context) ([]models.Leagues, error) {
+	if err := generateError(); err != nil {
+		return nil, err
+	}
+
+	leagues, err := f.decorated.Leagues(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error while fetching data from decorated: %w", err)
+	}
+
+	return leagues, nil
+}
+
+func (f *ErrorGeneratorDecorator) Teams(ctx context.Context) ([]models.Team, error) {
+	if err := generateError(); err != nil {
+		return nil, err
+	}
+
+	teams, err := f.decorated.Teams(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error while fetching data from decorated: %w", err)
+	}
+
+	return teams, nil
 }

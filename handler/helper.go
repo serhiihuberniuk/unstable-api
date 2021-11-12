@@ -10,16 +10,11 @@ import (
 )
 
 func httpResponseWithBytes(w http.ResponseWriter, content interface{}) {
-	data, err := json.Marshal(content)
+	err := json.NewEncoder(w).Encode(content)
 	if err != nil {
 		errorStatusHTTP(w, err)
 
 		return
-	}
-
-	_, err = w.Write(data)
-	if err != nil {
-		errorStatusHTTP(w, err)
 	}
 }
 
