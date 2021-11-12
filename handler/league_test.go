@@ -17,8 +17,10 @@ func TestHandler_Leagues(t *testing.T) {
 
 	type mockBehavior func(f *Mockfetcher, ctx context.Context)
 
-	jsonData := `[{"leagueid":0,"ticket":"string","banner":"string","tier":"string","name":"string"}]`
-
+	jsonData := `[
+{
+"leagueid":0,"ticket":"string","banner":"string","tier":"string","name":"string"}]
+`
 	bytesData := []byte(jsonData)
 
 	ctx := context.Background()
