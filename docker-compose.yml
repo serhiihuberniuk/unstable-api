@@ -1,0 +1,8 @@
+version: '3.9'
+services:
+   web:
+    restart: always
+    build: .
+    container_name: unstable-api
+    ports:
+      - "8080:8080"
