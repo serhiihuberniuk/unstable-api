@@ -25,17 +25,19 @@ func NewCustomStorage(ctx context.Context, expirationTime, checkExpiredInterval 
 	}
 
 	go func() {
-		select {
-		case <-ctx.Done():
-			return
-		case <-time.After(checkExpiredInterval):
-			s.mx.Lock()
-			for k, v := range s.cache {
-				if s.isExpired(v) {
-					delete(s.cache, k)
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-time.After(checkExpiredInterval):
+				s.mx.Lock()
+				for k, v := range s.cache {
+					if s.isExpired(v) {
+						delete(s.cache, k)
+					}
 				}
+				s.mx.Unlock()
 			}
-			s.mx.Unlock()
 		}
 	}()
 
